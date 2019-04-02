@@ -18,6 +18,7 @@
                   <th>Publish Date</th>
                   <th>Rating</th>
                   <th>Delete</th>
+                  <th>Edit</th>
               </tr>
           </thead>
           <tbody>
@@ -59,11 +60,13 @@
                 <input type="date" id="inputDate" class="form-control">
               </div>
             </div>
-            <button class="btn btn-primary" type="submit" onclick="addBook(event)">Submit</button>
+            <button class="btn btn-primary" type="submit" onclick="addBook()">Submit</button>
+            <button class="btn btn-primary" type="submit" onclick="editBook()">Save Edit</button>
           </form>
       <script defer src="http://unpkg.com/dexie@latest/dist/dexie.js"></script>
       <script defer src="./js/indexedDB.js"></script>
-      <script defer src="./js/app.js"></script>
+
       <script defer src="./js/populate-table.js"></script>
+      <script defer src="./js/app.js"></script>
   </body>
 </html>
