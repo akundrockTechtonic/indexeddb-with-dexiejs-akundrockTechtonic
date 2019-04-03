@@ -1,19 +1,22 @@
 function onDatabaseReady() {
     //populateTableUI() // DO NOT TOUCH THIS LINE until step #4
     updateTableUI();
-    _setupListeners();
+
     //console.log(db);
     // DexieJS docs: https://dexie.org/
 }
 
 function _setupListeners(){
-  document.querySelector("form").addEventListener("submit",function(e){
+  document.querySelector("#submitFormButton").addEventListener("click",function(e){
+    e.preventDefault();
+  });
+  document.querySelector("#submitFormButtonModal").addEventListener("click",function(e){
     e.preventDefault();
   });
 
 }
 function deleteBook(book) {
-  console.log(book.title);
+  //console.log(book.title);
 
   var deletedBook = db.books.delete(book.title)
   .catch(function(rejected) {
@@ -22,22 +25,24 @@ function deleteBook(book) {
   return deletedBook;
 }
 
-function _readFormBook(){
+function _readFormBook(bool){
+    var isModal=bool?'Modal':'';
+    //console.log("is modal!?",bool,isModal);
    return {
-     title:document.querySelector("#inputTitle").value,
-     author:document.querySelector("#inputAuthor").value,
-     numberOfPages:document.querySelector("#inputPages").value,
-     cover:document.querySelector("#inputCover").value,
-     synopsis:document.querySelector("#inputSynopsis").value,
-     publishDate:document.querySelector("#inputDate").value,
-     rating:document.querySelector("#inputRating").value
+     title:document.querySelector("#inputTitle"+isModal).value,
+     author:document.querySelector("#inputAuthor"+isModal).value,
+     numberOfPages:document.querySelector("#inputPages"+isModal).value,
+     cover:document.querySelector("#inputCover"+isModal).value,
+     synopsis:document.querySelector("#inputSynopsis"+isModal).value,
+     publishDate:document.querySelector("#inputDate"+isModal).value,
+     rating:document.querySelector("#inputRating"+isModal).value
    }
 }
 function addBook() {
     // Hint: Once you've added the book to your database, call populateTableUI with the added book's title
     // Check out the Table.put() method and what it returns at: https://dexie.org/docs/Table/Table.put()
-    let bookObj=_readFormBook();
-    console.log('Adding a book!',bookObj);
+    let bookObj=_readFormBook(false);
+    //console.log('Adding a book!',bookObj);
       var addedBook = db.books.put(bookObj).catch(function (error) {
           // Finally don't forget to catch any error
           // that could have happened anywhere in the code blocks above.
@@ -49,14 +54,14 @@ function addBook() {
 }
 
 
-function editBook(book) {
-  let bookObj=_readFormBook();
-  console.log('editBook called',bookObj);
+function editBook() {
+  let bookObj=_readFormBook(true);
+  //console.log('editBook called',bookObj);
   //_
   var updatedBook = db.books.update(bookObj.title, bookObj)
-  console.log("Updated,",updatedBook);
+  //console.log("Updated,",updatedBook);
   updatedBook.then(function(resolved) {
-     console.log(resolved)
+     //console.log(resolved)
   }).catch(function(rejected) {
     console.log(rejected);
    })
@@ -64,42 +69,76 @@ function editBook(book) {
 
 }
 async function _editButtonEventHandler(book){
-  console.log("Edit book!")
-  let bookObj=_updateFormBook(book);
+  //console.log("Edit book!")
+  createModal(book);
+  //console.log("Edit is done, now we need to read the submit button");
+  //let bookObj=_updateFormBook(book);
+}
+function saveEdit(){
+  //console.log("Inside save edit!");
+  editBook();
+  //Close the modal
+  var modal = document.getElementById('myModal');
+  modal.style.display = "none";
+
 }
 
 // ************ 4. (BONUS) Comment out line 67 in ../index.HTML and write your own 'populateTableUI' function in app.js ************
 
-async function _deleteButtonEventHandler(book){
-  console.log('Delete button received this book:',book);
-  await deleteBook(book);
+ function _deleteButtonEventHandler(book){
+  //console.log('Delete button received this book:',book);
+  deleteBook(book);
   updateTableUI();
-
 }
 
 
 function _updateFormBook(book){
+  //console.log("UpdateForm!",book);
   //Writes form to update book
-  document.querySelector("#inputTitle").value=book.title;
-  document.querySelector("#inputAuthor").value=book.author;
-  document.querySelector("#inputPages").value=book.numberOfPages;
+  document.querySelector("#inputTitleModal").value=book.title;
+  document.querySelector("#inputAuthorModal").value=book.author;
+  document.querySelector("#inputPagesModal").value=book.numberOfPages;
   //document.querySelector("#inputCover").value=book.cover;
-  document.querySelector("#inputSynopsis").value=book.synopsis;
-  document.querySelector("#inputDate").value=book.publishDate;
-  document.querySelector("#inputRating").value=book.rating;
+  document.querySelector("#inputSynopsisModal").value=book.synopsis;
+  document.querySelector("#inputDateModal").value=book.publishDate;
+  document.querySelector("#inputRatingModal").value=book.rating;
   //Add event listener where
 
   //Cover not working right Now
 
 
 }
+function createModal(book){
+  //console.log("Popping modal!");
+  //Update our modal contents before opening!
+  _updateFormBook(book);
+      // Get the modal
+    var modal = document.getElementById('myModal');
+    // Get the button that opens the modal
+    //Insert the form data here!
+    var span = document.getElementsByClassName("close")[0];
+    // When the user clicks on the button, open the modal
+      modal.style.display = "block";
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+
+}
 async function updateTableUI(){
+  _setupListeners();
   let allBooks = await db.books.where('numberOfPages').aboveOrEqual(0).toArray()
   const tBody = document.querySelector('tbody');
   tBody.rows=0;
   tBody.innerHTML='';
   //tBody.innerText='';
-  const columns = ['cover', 'title', 'author', 'numberOfPages', 'synopsis', 'publishDate', 'rating', 'Edit'];
+  const columns = ['cover', 'title', 'author', 'numberOfPages', 'synopsis', 'publishDate', 'rating','buttons'];
   for (let i = allBooks.length - 1; i >= 0; i--) {
     const row = document.createElement('tr');
 
@@ -109,51 +148,33 @@ async function updateTableUI(){
       td.innerText = value ? value : null;
       row.append(td);
     }
+    ////////// Creates the edit button
 
+    ////////
+    var td1 = document.createElement('td');
+    const editBtn = document.createElement('button');
+    editBtn.innerText = 'Edit book';
+    td.append(editBtn);
+    // deleteBtn.handleEvent=_deleteButtonEventHandler;
+    row.append(td);
+
+    editBtn.addEventListener("click",function (){
+
+      _editButtonEventHandler(allBooks[i]);
+    });
+    /////////
     // creates a delete button with no functionality
+    var td2 = document.createElement('td');
     const deleteBtn = document.createElement('button');
     deleteBtn.innerText = 'delete book';
     // deleteBtn.handleEvent=_deleteButtonEventHandler;
     deleteBtn.addEventListener("click",function (){
       _deleteButtonEventHandler(allBooks[i]);
     });
-    row.append(deleteBtn)
+    td2.append(deleteBtn)
+    row.append(td2)
     //////////
-    const editBtn = document.createElement('button');
-    editBtn.innerText = 'Edit book';
-    // deleteBtn.handleEvent=_deleteButtonEventHandler;
-    row.append(editBtn);
-    /////////
-    editBtn.addEventListener("click",function (){
-      _editButtonEventHandler(allBooks[i]);
-    });
-
     tBody.append(row);
 
   }
 }
-// Now that you’ve cloned your project lets start by testing our code. Let's start live
-//server and open up our project in the browser. Open up your console and you should see
-//some logs outputting book objects. These object are predefined in books.json and added to
-//our database called library_database in indexedDB. We can also navigate to the
-//application tab in the chrome console (storage in firefox) and take a look at the indexedDB
-//storage We created this for you in indexedDB.js if you feel inclined to take a look.
-
-// We've populated the table so the UI reflects what's currently in our local
-// library_database in indexedDB.  We've logged the database above so you can see exactly
-// what you're working with
-
-
-// 1.) Now add functionality to remove a row  which will need remove the object from the books store in
-//indexedDB database as well as the UI once the delete operation is complete. This will take some
-//effort on the UI. Use the title as your UID (Unique identifier) which you can find in the application console
-//in Chrome (storage in Firefox).
-
-// 2.) From here we want to be able to add a book. Hook up the form below the table to add a
-//book to the books store in indexedDB and auto-update the table without refreshing the page.
-//Hint: This add operation is on the front page of DexieJS.  Both is and Table.put() can be
-// used to add this book.
-
-// 3.) Now make each table row editable and update the database when the edit is complete. This will
-//take a lot of effort from the html to the js. Use the title as your UID (Unique identifier)
-//which you can find in the application console

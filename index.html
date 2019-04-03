@@ -1,72 +1,127 @@
 <!doctype html>
 <html>
-  <head>
-    <title>IndexedDB Assignment - DexieJS</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="./css/style.css">
-  </head>
-  <body>
-    <h1>IndexedDB Assignment</h1>
-      <table class="table table-striped">
-          <thead class="thead-dark">
-              <tr>
-                  <th>Cover</th>
-                  <th>Title</th>
-                  <th>Author</th>
-                  <th>Pages</th>
-                  <th>Synopsis</th>
-                  <th>Publish Date</th>
-                  <th>Rating</th>
-                  <th>Delete</th>
-                  <th>Edit</th>
-              </tr>
-          </thead>
-          <tbody>
-          </tbody>
-      </table>
-      <hr>
-      <form>
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label for="inputEmail4">Title</label>
-                <input minlength="1" type="text" class="form-control" id="inputTitle" placeholder="Title">
-              </div>
-              <div class="form-group col-md-6">
-                <label for="Author">Author</label>
-                <input type="text" class="form-control" id="inputAuthor" placeholder="Author">
-              </div>
-            </div>
-            <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="inputPages">Number Of Pages</label>
-              <input type="number" class="form-control" id="inputPages" placeholder="300">
-            </div>
-            <div class="form-group col-md-6">
-              <label for="inputCover">Cover</label>
-              <input type="file" class="form-control" id="inputCover">
-            </div>
-          </div>
-            <div class="form-group">
-              <label for="inputSynopsis">Synopsis</label>
-              <input type="text" class="form-control" id="inputSynopsis" placeholder="Synopsis">
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label for="inputRating">Rating</label>
-                <input type="number" class="form-control" id="inputRating" placeholder="5">
-              </div>
-              <div class="form-group col-md-6">
-                <label for="inputDate">Publish Date</label>
-                <input type="date" id="inputDate" class="form-control">
-              </div>
-            </div>
-            <button class="btn btn-primary" type="submit" onclick="addBook()">Submit</button>
-            <button class="btn btn-primary" type="submit" onclick="editBook()">Save Edit</button>
-          </form>
-      <script defer src="http://unpkg.com/dexie@latest/dist/dexie.js"></script>
-      <script defer src="./js/indexedDB.js"></script>
 
-      <script defer src="./js/populate-table.js"></script>
-      <script defer src="./js/app.js"></script>
-  </body>
+<head>
+  <title>IndexedDB Assignment - DexieJS</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+  <h1>IndexedDB Assignment</h1>
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr>
+        <th>Cover</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Pages</th>
+        <th>Synopsis</th>
+        <th>Publish Date</th>
+        <th>Rating</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+  <hr>
+  <form>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="inputEmail4">Title</label>
+        <input minlength="1" type="text" class="form-control" id="inputTitle" placeholder="Title">
+      </div>
+      <div class="form-group col-md-6">
+        <label for="Author">Author</label>
+        <input type="text" class="form-control" id="inputAuthor" placeholder="Author">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="inputPages">Number Of Pages</label>
+        <input type="number" class="form-control" id="inputPages" placeholder="300">
+      </div>
+      <div class="form-group col-md-6">
+        <label for="inputCover">Cover</label>
+        <input type="file" class="form-control" id="inputCover">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputSynopsis">Synopsis</label>
+      <input type="text" class="form-control" id="inputSynopsis" placeholder="Synopsis">
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="inputRating">Rating</label>
+        <input type="number" class="form-control" id="inputRating" placeholder="5">
+      </div>
+      <div class="form-group col-md-6">
+        <label for="inputDate">Publish Date</label>
+        <input type="date" id="inputDate" class="form-control">
+      </div>
+    </div>
+    <button class="btn btn-primary" id="submitFormButton" type="click" onclick="addBook()">Submit</button>
+
+    <!-- <button class="btn btn-primary" id="editFormButton" type="click" onclick="editBook()">Save Edit</button> -->
+  </form>
+  <!-- The Modal -->
+  <div id="myModal" class="modal">
+
+    <!-- Modal content -->
+    <div id="modalForm" class="modal-content">
+      <span class="close">&times;</span>
+      <!--Begin the modal!-->
+      <form>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputEmail4">Title</label>
+            <input minlength="1" type="text" class="form-control" id="inputTitleModal" placeholder="Title">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="Author">Author</label>
+            <input type="text" class="form-control" id="inputAuthorModal" placeholder="Author">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputPages">Number Of Pages</label>
+            <input type="number" class="form-control" id="inputPagesModal" placeholder="300">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="inputCover">Cover</label>
+            <input type="file" class="form-control" id="inputCoverModal">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputSynopsis">Synopsis</label>
+          <input type="text" class="form-control" id="inputSynopsisModal" placeholder="Synopsis">
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputRating">Rating</label>
+            <input type="number" class="form-control" id="inputRatingModal" placeholder="5">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="inputDate">Publish Date</label>
+            <input type="date" id="inputDateModal" class="form-control">
+          </div>
+        </div>
+        <button class="btn btn-primary" id="submitFormButtonModal" type="click" onclick="saveEdit()">Submit</button>
+        <!--<button class="btn btn-primary" id="editFormButton" type="click" onclick="editBook()">Save Edit</button>-->
+      </form>
+      <!--End The Modal!-->
+
+
+    </div>
+
+  </div>
+  <script defer src="http://unpkg.com/dexie@latest/dist/dexie.js"></script>
+  <script defer src="./js/indexedDB.js"></script>
+
+  <script defer src="./js/populate-table.js"></script>
+  <script defer src="./js/app.js"></script>
+</body>
+
 </html>
